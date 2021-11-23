@@ -7,6 +7,7 @@ import {
   Payload,
 } from '@nestjs/microservices';
 import { SensorData } from './app.dto';
+import { MqttValidationPipe } from './app.validation-pipe';
 
 @Controller()
 export class AppController {
@@ -14,7 +15,7 @@ export class AppController {
 
   @MessagePattern('sensor/+')
   public async create(
-    @Payload() sensorData: SensorData,
+    @Payload(new MqttValidationPipe()) sensorData: SensorData,
     @Ctx() context: MqttContext,
   ) {
     return this.appService.save(sensorData, context);
