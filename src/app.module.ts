@@ -12,6 +12,7 @@ import { AppService } from './app.service';
       // Store-specific configuration:
       host: 'localhost',
       port: 6379,
+      ttl: 1000,
     }),
   ],
   controllers: [AppController],

@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { AppService } from './app.service';
 import {
   Ctx,
@@ -18,6 +18,6 @@ export class AppController {
     @Payload(new MqttValidationPipe()) sensorData: SensorData,
     @Ctx() context: MqttContext,
   ) {
-    return this.appService.save(sensorData, context);
+    return await this.appService.save(sensorData, context);
   }
 }
