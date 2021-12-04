@@ -3,6 +3,7 @@ import * as redisStore from 'cache-manager-redis-store';
 import { CacheModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { SocketIoGateway } from './socket-io.gateway';
 
 @Module({
   imports: [
@@ -16,6 +17,6 @@ import { AppService } from './app.service';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, SocketIoGateway],
 })
 export class AppModule {}
