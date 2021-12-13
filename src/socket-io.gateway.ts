@@ -1,4 +1,5 @@
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -6,11 +7,9 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  WsResponse,
 } from '@nestjs/websockets';
-import { from, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { Server, Socket } from 'socket.io';
+import type { Room } from 'socket.io-adapter';
 import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({
@@ -22,22 +21,39 @@ import { Logger } from '@nestjs/common';
 export class SocketIoGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  // @WebSocketServer()
-  // server: Server;
+  @WebSocketServer()
+  server: Server;
 
   private logger: Logger = new Logger('SocketIoGateway');
 
-  @SubscribeMessage('events')
-  findAll(@MessageBody() data: any): Observable<WsResponse<number>> {
-    return from([1, 2, 3]).pipe(
-      map((item) => ({ event: 'events', data: item })),
-    );
+  @SubscribeMessage('joinRoom')
+  async joinRoom(
+    @MessageBody() room: string,
+    @ConnectedSocket() client: Socket,
+  ): Promise<void> {
+    this.logger.log('Joining room ' + room);
+    client.join(room);
   }
 
-  @SubscribeMessage('identity')
-  async identity(@MessageBody() data: number): Promise<number> {
-    this.logger.log(data);
-    return data;
+  @SubscribeMessage('leaveRoom')
+  async leaveRoom(
+    @MessageBody() room: string,
+    @ConnectedSocket() client: Socket,
+  ): Promise<void> {
+    this.logger.log('Leaving room ' + room);
+    client.leave(room);
+  }
+
+  @SubscribeMessage('getRooms')
+  async getRooms(
+    @MessageBody() room: string,
+    @ConnectedSocket() client: Socket,
+  ): Promise<Set<Room>> {
+    return client.rooms;
+  }
+
+  async emitInRoom(room: string, data: any) {
+    this.server.in(room).emit('sensor', data);
   }
 
   afterInit(server: Server) {
