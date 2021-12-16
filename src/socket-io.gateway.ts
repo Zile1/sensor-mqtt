@@ -56,6 +56,10 @@ export class SocketIoGateway
     this.server.in(room).emit('sensor', data);
   }
 
+  async emit(data: any) {
+    this.server.emit('sensor', data);
+  }
+
   afterInit(server: Server) {
     this.logger.log('Init');
   }

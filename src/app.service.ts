@@ -15,7 +15,8 @@ export class AppService {
     const topic = context.getTopic();
     sensorData.id = await AppService.getIdFromTopic(topic);
     await this.saveKey(context);
-    await this.socket.emitInRoom(topic, sensorData);
+    // await this.socket.emitInRoom(topic, sensorData);
+    await this.socket.emit(sensorData);
     return await this.cacheManager.set(topic, sensorData);
   }
 
